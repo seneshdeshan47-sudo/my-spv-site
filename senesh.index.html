@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.PV - Media Share</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css " rel="stylesheet">
+    <style>
+        /* ============================================
+           CSS VARIABLES - Light & Dark Mode
+           ============================================ */
+        :root {
+            /* Light Mode (Default) */
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f3f5;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --text-muted: #adb5bd;
+            --border-color: #dee2e6;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.15);
+            
+            /* Accent Colors */
+            --primary: #e91e63;
+            --primary-light: #f48fb1;
+            --primary-dark: #c2185b;
+            --success: #4caf50;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --info: #2196f3;
+            
+            /* Transitions */
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+        }
+
+        /* Dark Mode */
+        [data-theme="dark"] {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #666666;
+            --border-color: #333333;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ============================================
+           BASE STYLES
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background-color var(--transition-slow), color var(--transition-slow);
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(20px);
+            transition: all var(--transition-slow);
+        }
+
+        .header-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -1px;
+        }
+
+        .logo i {
+            font-size: 24px;
+        }
+
+        /* Theme Toggle Switch */
+        .theme-toggle {
+            position: relative;
+            width: 60px;
+            height: 32px;
+            background: var(--bg-tertiary);
+            border-radius: 50px;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            transition: all var(--transition-normal);
+            overflow: hidden;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--primary);
+        }
+
+        .theme-toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 50%;
+            transition: transform var(--transition-normal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+        }
+
+        [data-theme="dark"] .theme-toggle-slider {
+            transform: translateX(28px);
+        }
+
+        .theme-toggle-icons {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 8px;
+            font-size: 12px;
+            pointer-events: none;
+        }
+
+        .theme-toggle-icons .sun {
+            color: var(--warning);
+        }
+
+        .theme-toggle-icons .moon {
+            color: var(--info);
+        }
+
+        /* ============================================
+           MAIN CONTAINER
+           ============================================ */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 24px 16px 60px;
+        }
+
+        /* ============================================
+           UPLOAD SECTION
+           ============================================ */
+        .upload-section {
+            margin-bottom: 32px;
+        }
+
+        .upload-zone {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            border-radius: 20px;
+            padding: 48px 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(233, 30, 99, 0.05) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+
+        .upload-zone:hover,
+        .upload-zone.drag-active {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .upload-zone:hover::before,
+        .upload-zone.drag-active::before {
+            opacity: 1;
+        }
+
+        .upload-zone.drag-active {
+            background: rgba(233, 30, 99, 0.03);
+        }
+
+        .upload-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            transition: transform var(--transition-normal);
+        }
+
+        .upload-zone:hover .upload-icon {
+            transform: scale(1.1);
+        }
+
+        .upload-zone h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .upload-zone p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .progress-container.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-header span {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .progress-header .percentage {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 4px;
+            transition: width 0.1s linear;
+            width: 0%;
+        }
+
+        /* ============================================
+           PREVIEW SECTION
+           ============================================ */
+        .preview-section {
+            display: none;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 32px;
+            animation: slideUp 0.4s ease;
+        }
+
+        .preview-section.active {
+            display: block;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .preview-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+        }
+
+        .preview-header h3 i {
+            color: var(--primary);
+        }
+
+        .btn-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-close:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .preview-media-container {
+            position: relative;
+            background: var(--bg-primary);
+        }
+
+        .preview-media {
+            width: 100%;
+            max-height: 450px;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* Filter Controls */
+        .filter-controls {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+        }
+
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Preview Info */
+        .preview-info {
+            padding: 20px;
+        }
+
+        .caption-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            resize: none;
+            margin-bottom: 16px;
+            transition: all var(--transition-fast);
+        }
+
+        .caption-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg-secondary);
+        }
+
+        .caption-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(233, 30, 99, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        /* Spinner */
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .btn.loading .spinner {
+            display: inline-block;
+        }
+
+        .btn.loading .btn-text {
+            display: none;
+        }
+
+        /* ============================================
+           ERROR MESSAGE
+           ============================================ */
+        .error-message {
+            display: none;
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            animation: shake 0.5s ease;
+        }
+
+        .error-message.active {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .error-message i {
+            font-size: 20px;
+            color: var(--danger);
+        }
+
+        .error-message span {
+            color: var(--danger);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* ============================================
+           FEED SECTION
+           ============================================ */
+        .feed-section {
+            margin-top: 40px;
+        }
+
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .feed-title {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-primary);
+        }
+
+        .feed-title i {
+            color: var(--primary);
+        }
+
+        .feed-stats {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .feed-stats strong {
+            color: var(--primary);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 24px;
+            background: var(--bg-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            font-size: 15px;
+        }
+
+        /* Feed Item Card */
+        .feed-item {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .feed-item:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .feed-media-wrapper {
+            position: relative;
+            background: var(--bg-primary);
+        }
+
+        .feed-media {
+            width: 100%;
+            display: block;
+            max-height: 600px;
+            object-fit: contain;
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feed-content {
+            padding: 20px;
+        }
+
+        .feed-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .feed-timestamp {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feed-caption {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            word-wrap: break-word;
+        }
+
+        /* Feed Actions */
+        .feed-actions {
+            display: flex;
+            gap: 8px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .action-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .action-btn:hover {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .action-btn.like-btn.liked {
+            background: rgba(233, 30, 99, 0.1);
+            color: var(--primary);
+        }
+
+        .action-btn.like-btn.liked i {
+            animation: heartBeat 0.4s ease;
+        }
+
+        .action-btn.download-btn:hover {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+        }
+
+        .action-btn.delete-btn:hover {
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--danger);
+        }
+
+        .like-count {
+            font-weight: 700;
+        }
+
+        /* ============================================
+           ANIMATIONS
+           ============================================ */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.2); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+        @media (max-width: 640px) {
+            .container {
+                padding: 16px 12px 40px;
+            }
+
+            .header-content {
+                padding: 12px 16px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .upload-zone {
+                padding: 36px 24px;
+            }
+
+            .upload-icon {
+                width: 64px;
+                height: 64px;
+                font-size: 26px;
+            }
+
+            .filter-buttons {
+                gap: 8px;
+            }
+
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .feed-item {
+                border-radius: 16px;
+                margin-bottom: 20px;
+            }
+
+            .feed-content {
+                padding: 16px;
+            }
+
+            .action-btn {
+                padding: 10px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .preview-actions {
+                flex-direction: column;
+            }
+
+            .feed-actions {
+                flex-wrap: wrap;
+            }
+
+            .action-btn {
+                flex: 1 1 calc(50% - 4px);
+            }
+        }
+
+        /* ============================================
+           SCROLLBAR
+           ============================================ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-camera-retro"></i>
+                S.PV
+            </div>
+            <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+                <div class="theme-toggle-slider">
+                    <i class="fas fa-sun" id="themeIcon"></i>
+                </div>
+                <div class="theme-toggle-icons">
+                    <i class="fas fa-sun sun"></i>
+                    <i class="fas fa-moon moon"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="errorText">Video must be 60 seconds or less!</span>
+        </div>
+
+        <!-- Upload Section -->
+        <section class="upload-section">
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <h3>Drag & drop your media here</h3>
+                <p>or click to browse • Photos & Videos supported</p>
+                <input type="file" id="fileInput" accept="image/*,video/*">
+            </div>
+
+            <!-- Progress Container -->
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-header">
+                    <span><i class="fas fa-spinner fa-spin"></i> Processing...</span>
+                    <span class="percentage" id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Preview Section -->
+        <section class="preview-section" id="previewSection">
+            <div class="preview-header">
+                <h3><i class="fas fa-eye"></i> Preview</h3>
+                <button class="btn-close" onclick="closePreview()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="preview-media-container">
+                <div id="previewMediaWrapper"></div>
+            </div>
+
+            <!-- Filter Controls (Images only) -->
+            <div class="filter-controls" id="filterControls">
+                <span class="filter-label"><i class="fas fa-magic"></i> Apply Filter</span>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="none" onclick="applyFilter('none')">Original</button>
+                    <button class="filter-btn" data-filter="grayscale(100%)" onclick="applyFilter('grayscale(100%)')">Grayscale</button>
+                    <button class="filter-btn" data-filter="sepia(100%)" onclick="applyFilter('sepia(100%)')">Sepia</button>
+                    <button class="filter-btn" data-filter="brightness(1.2)" onclick="applyFilter('brightness(1.2)')">Bright</button>
+                    <button class="filter-btn" data-filter="contrast(1.3)" onclick="applyFilter('contrast(1.3)')">Contrast</button>
+                    <button class="filter-btn" data-filter="saturate(1.5)" onclick="applyFilter('saturate(1.5)')">Vivid</button>
+                </div>
+            </div>
+
+            <div class="preview-info">
+                <textarea class="caption-input" id="captionInput" placeholder="Write a caption..." rows="2"></textarea>
+                <div class="preview-actions">
+                    <button class="btn btn-secondary" onclick="closePreview()">Cancel</button>
+                    <button class="btn btn-primary" id="postBtn" onclick="publishPost()">
+                        <span class="spinner"></span>
+                        <span class="btn-text"><i class="fas fa-paper-plane"></i> Share</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feed Section -->
+        <section class="feed-section">
+            <div class="feed-header">
+                <h2 class="feed-title">
+                    <i class="fas fa-images"></i>
+                    Your Feed
+                </h2>
+                <span class="feed-stats" id="feedStats"><strong>0</strong> posts</span>
+            </div>
+
+            <div id="feedContainer">
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3>No posts yet</h3>
+                    <p>Share your first photo or video to see it here!</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // ============================================
+        // STATE MANAGEMENT
+        // ============================================
+        let currentFile = null;
+        let currentFilter = 'none';
+        let posts = JSON.parse(localStorage.getItem('spv_posts')) || [];
+        let isDarkMode = localStorage.getItem('spv_theme') === 'dark';
+
+        // ============================================
+        // DOM ELEMENTS
+        // ============================================
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewSection = document.getElementById('previewSection');
+        const previewMediaWrapper = document.getElementById('previewMediaWrapper');
+        const filterControls = document.getElementById('filterControls');
+        const captionInput = document.getElementById('captionInput');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressPercent = document.getElementById('progressPercent');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const feedContainer = document.getElementById('feedContainer');
+        const feedStats = document.getElementById('feedStats');
+        const postBtn = document.getElementById('postBtn');
+        const themeIcon = document.getElementById('themeIcon');
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Apply saved theme
+            if (isDarkMode) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+
+            // Render existing posts
+            renderFeed();
+        });
+
+        // ============================================
+        // THEME TOGGLE
+        // ============================================
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            
+            if (isDarkMode) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+            
+            localStorage.setItem('spv_theme', isDarkMode ? 'dark' : 'light');
+        }
+
+        // ============================================
+        // UPLOAD ZONE EVENTS
+        // ============================================
+        uploadZone.addEventListener('click', () => fileInput.click());
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('drag-active');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('drag-active');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-active');
+            if (e.dataTransfer.files.length > 0) {
+                processFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                processFile(e.target.files[0]);
+            }
+        });
+
+        // ============================================
+        // FILE PROCESSING
+        // ============================================
+        function processFile(file) {
+            // Hide any previous errors
+            hideError();
+
+            // Validate file type
+            if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+                showError('Please select a valid image or video file.');
+                return;
+            }
+
+            // Show progress
+            showProgress();
+
+            // Simulate processing progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(progressInterval);
+                    
+                    setTimeout(() => {
+                        hideProgress();
+                        
+                        // Check video duration if video
+                        if (file.type.startsWith('video/')) {
+                            validateVideoDuration(file);
+                        } else {
+                            currentFile = file;
+                            showPreview(file);
+                        }
+                    }, 300);
+                }
+                updateProgress(progress);
+            }, 100);
+        }
+
+        function validateVideoDuration(file) {
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+            
+            video.onloadedmetadata = function() {
+                window.URL.revokeObjectURL(video.src);
+                
+                if (video.duration > 60) {
+                    showError('❌ Video exceeds 60-second limit! Your video is ' + Math.round(video.duration) + ' seconds.');
+                    fileInput.value = '';
+                } else {
+                    currentFile = file;
+                    currentFile.duration = video.duration;
+                    showPreview(file);
+                }
+            };
+            
+            video.onerror = function() {
+                showError('Unable to read video file. Please try another.');
+            };
+            
+            video.src = URL.createObjectURL(file);
+        }
+
+        // ============================================
+        // PROGRESS INDICATORS
+        // ============================================
+        function showProgress() {
+            progressContainer.classList.add('active');
+            updateProgress(0);
+        }
+
+        function hideProgress() {
+            progressContainer.classList.remove('active');
+        }
+
+        function updateProgress(percent) {
+            progressFill.style.width = percent + '%';
+            progressPercent.textContent = Math.round(percent) + '%';
+        }
+
+        // ============================================
+        // ERROR HANDLING
+        // ============================================
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.add('active');
+            setTimeout(hideError, 5000);
+        }
+
+        function hideError() {
+            errorMessage.classList.remove('active');
+        }
+
+        // ============================================
+        // PREVIEW SECTION
+        // ============================================
+        function showPreview(file) {
+            const url = URL.createObjectURL(file);
+            currentFilter = 'none';
+            
+            // Reset filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filter === 'none') {
+                    btn.classList.add('active');
+                }
+            });
+
+            if (file.type.startsWith('video/')) {
+                // Hide filter controls for videos
+                filterControls.style.display = 'none';
+                previewMediaWrapper.innerHTML = `
+                    <video class="preview-media" src="${url}" controls style="max-height: 450px;"></video>
+                `;
+            } else {
+                // Show filter controls for images
+                filterControls.style.display = 'block';
+                previewMediaWrapper.innerHTML = `
+                    <img class="preview-media" id="previewImage" src="${url}" alt="Preview" style="max-height: 450px;">
+                `;
+            }
+
+            previewSection.classList.add('active');
+            captionInput.value = '';
+            
+            // Scroll to preview
+            previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function closePreview() {
+            previewSection.classList.remove('active');
+            previewMediaWrapper.innerHTML = '';
+            currentFile = null;
+            currentFilter = 'none';
+            fileInput.value = '';
+            captionInput.value = '';
+        }
+
+        // ============================================
+        // FILTER CONTROLS
+        // ============================================
+        function applyFilter(filter) {
+            currentFilter = filter;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filter === filter) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Apply filter to preview image
+            const previewImage = document.getElementById('previewImage');
+            if (previewImage) {
+                previewImage.style.filter = filter;
+            }
+        }
+
+        // ============================================
+        // PUBLISH POST
+        // ============================================
+        async function publishPost() {
+            if (!currentFile) return;
+
+            postBtn.classList.add('loading');
+            postBtn.disabled = true;
+
+            // Simulate upload delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Create post object
+            const post = {
+                id: Date.now(),
+                type: currentFile.type.startsWith('video/') ? 'video' : 'image',
+                data: URL.createObjectURL(currentFile),
+                caption: captionInput.value.trim(),
+                filter: currentFilter,
+                timestamp: new Date().toISOString(),
+                likes: 0,
+                liked: false
+            };
+
+            // Add duration for videos
+            if (post.type === 'video' && currentFile.duration) {
+                post.duration = currentFile.duration;
+            }
+
+            // Add to posts array
+            posts.unshift(post);
+            
+            // Save to localStorage
+            localStorage.setItem('spv_posts', JSON.stringify(posts));
+
+            // Render feed
+            renderFeed();
+
+            // Reset and close preview
+            postBtn.classList.remove('loading');
+            postBtn.disabled = false;
+            closePreview();
+        }
+
+        // ============================================
+        // RENDER FEED
+        // ============================================
+        function renderFeed() {
+            if (posts.length === 0) {
+                feedContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <h3>No posts yet</h3>
+                        <p>Share your first photo or video to see it here!</p>
+                    </div>
+                `;
+                feedStats.innerHTML = '<strong>0</strong> posts';
+                return;
+            }
+
+            feedStats.innerHTML = `<strong>${posts.length}</strong> post${posts.length !== 1 ? 's' : ''}`;
+
+            feedContainer.innerHTML = posts.map(post => `
+                <article class="feed-item" data-id="${post.id}">
+                    <div class="feed-media-wrapper">
+                        ${post.type === 'video' 
+                            ? `<video class="feed-media" src="${post.data}" controls></video>
+                               ${post.duration ? `<span class="video-duration"><i class="fas fa-play"></i> ${formatDuration(post.duration)}</span>` : ''}`
+                            : `<img class="feed-media" src="${post.data}" alt="Post" style="filter: ${post.filter};">`
+                        }
+                    </div>
+                    <div class="feed-content">
+                        <div class="feed-meta">
+                            <span class="feed-timestamp">
+                                <i class="far fa-clock"></i>
+                                ${formatTimeAgo(post.timestamp)}
+                            </span>
+                        </div>
+                        ${post.caption ? `<p class="feed-caption">${escapeHtml(post.caption)}</p>` : ''}
+                        <div class="feed-actions">
+                            <button class="action-btn like-btn ${post.liked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+                                <i class="${post.liked ? 'fas' : 'far'} fa-heart"></i>
+                                <span class="like-count">${post.likes}</span>
+                            </button>
+                            <button class="action-btn download-btn" onclick="downloadMedia(${post.id})">
+                                <i class="fas fa-download"></i>
+                                <span>Download</span>
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deletePost(${post.id})">
+                                <i class="far fa-trash-alt"></i>
+                                <span>Delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // ============================================
+        // FEED ACTIONS
+        // ============================================
+        function toggleLike(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+
+            post.liked = !post.liked;
+            post.likes += post.liked ? 1 : -1;
+
+            localStorage.setItem('spv_posts', JSON.stringify(posts));
+            renderFeed();
+        }
+
+        function downloadMedia(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+
+            const link = document.createElement('a');
+            link.href = post.data;
+            link.download = `spv-media-${post.id}.${post.type === 'video' ? 'mp4' : 'jpg'}`;
+            link.click();
+        }
+
+        function deletePost(postId) {
+            if (!confirm('Are you sure you want to delete this post?')) return;
+
+            posts = posts.filter(p => p.id !== postId);
+            localStorage.setItem('spv_posts', JSON.stringify(posts));
+            renderFeed();
+        }
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function formatDuration(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function formatTimeAgo(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return `Posted ${Math.floor(seconds / 60)} min${Math.floor(seconds / 60) !== 1 ? 's' : ''} ago`;
+            if (seconds < 86400) return `Posted ${Math.floor(seconds / 3600)} hour${Math.floor(seconds / 3600) !== 1 ? 's' : ''} ago`;
+            if (seconds < 604800) return `Posted ${Math.floor(seconds / 86400)} day${Math.floor(seconds / 86400) !== 1 ? 's' : ''} ago`;
+            
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'now' !== 'now' ? 'numeric' : undefined });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
